@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"math/rand"
 	"net"
@@ -14,6 +15,11 @@ import (
 )
 
 func main() {
+
+	// verbose flag - Will print the domain that has the CNAME as the second parameter in a comma separated line
+	var verbose bool
+	flag.BoolVar(&verbose, "v", false, "Outputs the domains that generated the cname too in format: cname_value,cname")
+	flag.Parse()
 
 	servers := []string{
 		"8.8.8.8",
@@ -41,7 +47,15 @@ func main() {
 					continue
 				}
 
-				fmt.Println(cname)
+				// Remove trailing .
+				cname = strings.TrimSuffix(cname, ".")
+
+				if verbose {
+					fmt.Printf("%s,%s\n", cname, string(j.domain))
+				} else {
+					fmt.Printf("%s", cname)
+				}
+
 			}
 			wg.Done()
 		}()
