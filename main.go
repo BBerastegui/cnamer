@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"net"
+	"net/http"
 	"os"
 	"strings"
 	"sync"
@@ -27,7 +29,17 @@ func main() {
 		"9.9.9.9",
 		"1.1.1.1",
 		"1.0.0.1",
+		"8.8.8.8",
+		"8.8.4.4",
 	}
+
+	// Try to grab a better list of DNS servers
+	resp, err := http.Get("https://raw.githubusercontent.com/BBerastegui/fresh-dns-servers/master/resolvers.csv")
+	body, err := ioutil.ReadAll(resp.Body)
+	if err == nil {
+		servers = strings.Split(string(body), ",")
+	}
+	defer resp.Body.Close()
 
 	rand.Seed(time.Now().Unix())
 
@@ -35,7 +47,8 @@ func main() {
 	jobs := make(chan job)
 
 	var wg sync.WaitGroup
-	for i := 0; i < 20; i++ {
+	// Launch 10 goroutines per server
+	for i := 0; i < len(servers)*10; i++ {
 		wg.Add(1)
 
 		go func() {
