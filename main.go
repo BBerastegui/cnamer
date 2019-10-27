@@ -66,7 +66,7 @@ func main() {
 				if verbose {
 					fmt.Printf("%s,%s\n", cname, string(j.domain))
 				} else {
-					fmt.Printf("%s", cname)
+					fmt.Printf("%s\n", cname)
 				}
 
 			}
